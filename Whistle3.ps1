@@ -47,7 +47,12 @@ function APIRequest
     )
    
     $Result = Invoke-WebRequest -Uri "$($whistle_api_const.protocol)://$($whistle_api_const.remote_host)/$($whistle_api_const.endpoint)/$resource" -Method $Method -Body $Data -Headers $Headers
-    return $Result
+
+    if ($Resource -eq "login") {
+        return $Result
+    } else {
+        return (([System.Text.Encoding]::UTF8.GetString($result.Content)) | ConvertFrom-Json)
+    }
 }
 
 function login()
@@ -66,8 +71,7 @@ function get_pets
     param(
         [String]$Token
     )
-    $Result = APIRequest -Method GET -Resource "pets" -Headers $(Headers $Token)
-    return ([System.Text.Encoding]::UTF8.GetString($result.Content) | ConvertFrom-Json).pets
+    return (APIRequest -Method GET -Resource "pets" -Headers $(Headers $Token)).pets
 }
 
 function get_owners
@@ -77,8 +81,7 @@ function get_owners
         [String]$Token,
         [Int]$pet_id
     )
-    $Result = APIRequest -Method GET -Resource "pets/$pet_id/owners" -Headers $(Headers $Token)
-    return ([System.Text.Encoding]::UTF8.GetString($result.Content) | ConvertFrom-Json).owners
+    return (APIRequest -Method GET -Resource "pets/$pet_id/owners" -Headers $(Headers $Token)).owners
 }
 
 function get_places
@@ -87,8 +90,7 @@ function get_places
     param(
         [String]$Token
     )
-    $Result = APIRequest -Method GET -Resource "places" -Headers $(Headers $Token)
-    return ([System.Text.Encoding]::UTF8.GetString($result.Content) | ConvertFrom-Json)
+    return (APIRequest -Method GET -Resource "places" -Headers $(Headers $Token))
 }
 
 function get_stats
@@ -98,8 +100,8 @@ function get_stats
         [String]$Token,
         [Int]$pet_id
     )
-    $Result = APIRequest -Method GET -Resource "pets/$pet_id/stats" -Headers $(Headers $Token)
-    return ([System.Text.Encoding]::UTF8.GetString($result.Content) | ConvertFrom-Json).stats
+    return (APIRequest -Method GET -Resource "pets/$pet_id/stats" -Headers $(Headers $Token)).stats
+    
 }
 
 function get_timeline
@@ -111,8 +113,7 @@ function get_timeline
         [String]$Token,
         [Int]$pet_id
     )
-    $Result = APIRequest -Method GET -Resource "pets/$pet_id/timelines/location" -Headers $(Headers $Token)
-    return ([System.Text.Encoding]::UTF8.GetString($result.Content) | ConvertFrom-Json).timeline
+    return (APIRequest -Method GET -Resource "pets/$pet_id/timelines/location" -Headers $(Headers $Token)).timeline
 }
 
 function get_dailies
@@ -122,8 +123,7 @@ function get_dailies
         [String]$Token,
         [Int]$pet_id
     )
-    $Result = APIRequest -Method GET -Resource "pets/$pet_id/dailies" -Headers $(Headers $Token)
-    return ([System.Text.Encoding]::UTF8.GetString($result.Content) | ConvertFrom-Json).dailies
+    return (APIRequest -Method GET -Resource "pets/$pet_id/dailies" -Headers $(Headers $Token)).dailies
 }
 
 function get_dailies_day
@@ -134,8 +134,7 @@ function get_dailies_day
         [Int]$pet_id,
         [Int]$day_id
     )
-    $Result = APIRequest -Method GET -Resource "pets/$pet_id/dailies/$day_id" -Headers $(Headers $Token)
-    return ([System.Text.Encoding]::UTF8.GetString($result.Content) | ConvertFrom-Json).daily
+    return (APIRequest -Method GET -Resource "pets/$pet_id/dailies/$day_id" -Headers $(Headers $Token)).daily
 }
 
 function get_achievements
@@ -147,8 +146,7 @@ function get_achievements
         [String]$Token,
         [Int]$pet_id
     )
-    $Result = APIRequest -Method GET -Resource "pets/$pet_id/achievements" -Headers $(Headers $Token)
-    return ([System.Text.Encoding]::UTF8.GetString($result.Content) | ConvertFrom-Json).daily
+    return (APIRequest -Method GET -Resource "pets/$pet_id/achievements" -Headers $(Headers $Token)).achievements
 }
 
 $AuthToken = login -login_cred $user_config
